@@ -1,0 +1,73 @@
+{
+  "page_size": 50,
+  "page": 1,
+  "total_items": 2,
+  "total_pages": 1,
+  "_embedded": {
+    "applications": [
+      {
+        "id": "a01e3929-38a4-4db0-aa7c-429ccbe95176",
+        "name": "App 1",
+        "keys": {
+          "public_key": "-----BEGIN PUBLIC KEY-----\nApp 1 Public Key-----END PUBLIC KEY-----\n"
+        },
+        "privacy": {
+          "improve_ai": true
+        },
+        "capabilities": {
+          "messages": {
+            "webhooks": {
+              "inbound_url": {
+                "address": "https://test.app/api/app1/inbound",
+                "http_method": "POST"
+              },
+              "status_url": {
+                "address": "https://test.app/api/app1/inbound",
+                "http_method": "POST"
+              }
+            },
+            "version": "v1",
+            "authenticate_inbound_media": false
+          }
+        }
+      },
+      {
+        "id": "bed6ecc1-7e35-4972-8f13-d048368f04f2",
+        "name": "App 2",
+        "keys": {
+          "public_key": "-----BEGIN PUBLIC KEY-----\nApp 2 Public Key \n-----END PUBLIC KEY-----\n"
+        },
+        "privacy": {
+          "improve_ai": true
+        },
+        "capabilities": {
+          "messages": {
+            "webhooks": {
+              "inbound_url": {
+                "address": "https://test.app/api/app2/inbound",
+                "http_method": "POST"
+              },
+              "status_url": {
+                "address": "https://test.app/api/app2/status",
+                "http_method": "POST"
+              }
+            },
+            "version": "v1",
+            "authenticate_inbound_media": false
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "/v2/applications?page_size=50&page=1"
+    },
+    "first": {
+      "href": "/v2/applications?page_size=50"
+    },
+    "last": {
+      "href": "/v2/applications?page_size=50&page=1"
+    }
+  }
+}

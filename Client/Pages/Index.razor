@@ -1,0 +1,30 @@
+﻿@page "/"
+@inject ApplicationService ApplicationService
+
+<PageTitle>Vonage Project</PageTitle>
+
+@if (Applications == null)
+{
+    <span>Loading...</span>
+}
+else
+{
+    <a class="btn btn-primary" href="/application/new">New Application</a>
+
+    foreach (var appServiceApplication in Applications)
+    {
+        <VonageApplicationSummary Application="appServiceApplication"></VonageApplicationSummary>
+    }
+}
+
+@code
+{
+    private List<VonageApp> Applications;
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ApplicationService.GetApps();
+        Applications = result.Embedded.Applications;
+
+        await base.OnInitializedAsync();
+    }
+}

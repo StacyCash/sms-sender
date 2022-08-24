@@ -1,0 +1,33 @@
+﻿@inherits LayoutComponentBase
+@inject IVonageApiKey ApiKey
+@inject HttpClient httpClient
+
+<PageTitle>Client</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            Balance $@($"{Balance:0.00}")
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code
+{
+    private decimal Balance;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var vonageAccount = new VonageAccount(httpClient, ApiKey);
+        Balance = await vonageAccount.GetBalanceAsync();
+        await base.OnInitializedAsync();
+    }
+}

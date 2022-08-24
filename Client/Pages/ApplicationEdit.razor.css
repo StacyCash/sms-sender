@@ -1,0 +1,15 @@
+﻿.field-container {
+    display: flex;
+    flex-direction: row;
+    max-width: 800px;
+    padding-bottom: 5px;
+}
+
+.field-label {
+    width: 300px;
+    max-width: 30%;
+}
+
+.field-content {
+    width: 100%
+}

@@ -1,0 +1,31 @@
+{
+  "id": "a01e3929-38a4-4db0-aa7c-429ccbe95176",
+  "name": "App 1",
+  "keys": {
+    "public_key": "-----BEGIN PUBLIC KEY-----\nApp 1 Public Key-----END PUBLIC KEY-----\n"
+  },
+  "privacy": {
+    "improve_ai": true
+  },
+  "capabilities": {
+    "messages": {
+      "webhooks": {
+        "inbound_url": {
+          "address": "https://test.app/api/app1/inbound",
+          "http_method": "POST"
+        },
+        "status_url": {
+          "address": "https://test.app/api/app1/inbound",
+          "http_method": "POST"
+        }
+      },
+      "version": "v1",
+      "authenticate_inbound_media": false
+    }
+  },
+  "_links": {
+    "self": {
+      "href": "/v2/applications/a01e3929-38a4-4db0-aa7c-429ccbe95176"
+    }
+  }
+}

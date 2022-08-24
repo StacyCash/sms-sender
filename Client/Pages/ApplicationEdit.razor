@@ -1,0 +1,218 @@
+﻿@page "/application/{Id:guid}/Edit"
+@page "/application/new"
+@inject MessageService MessageService
+@inject ApplicationService ApplicationService
+@inject NavigationManager NavigationManager
+
+@if (_vonageApp is null)
+{
+    <div>Loading...</div>
+}
+else
+{
+    @if (_knownByApplication)
+    {
+        <button @onclick="Delete">Delete</button>
+    }
+
+    <h3>@_vonageApp.Name</h3>
+    <div class="field-container">
+        <div class="field-label"><label>Application Id:</label></div>
+        <div class="field-content">@_vonageApp.Id</div>
+    </div>
+
+    @if (_editMode)
+    {
+        <EditForm Model="@_vonageApp" OnValidSubmit="@ToggleEditMode">
+            <h4>Application General</h4>
+            
+            <div class="field-container">
+                <div class="field-label"><label>Application Name:</label></div>
+                <div class="field-content"><InputText @bind-Value="_vonageApp.Name"></InputText></div>
+            </div>
+
+            <h4>Privacy</h4>
+            <div class="field-container">
+                <div class="field-label"><label>Improve AI:</label></div>
+                <div class="field-content">
+                    <InputCheckbox @bind-Value="_vonageApp.Privacy.ImproveAi"></InputCheckbox>
+                </div>
+            </div>
+
+            <h4>Capabilities</h4>
+            <h5>Messages</h5>
+            
+            <div class="field-container">
+                <div class="field-label"><label>Inbound Webhook:</label></div>
+                <div class="field-content">
+                    <InputText @bind-Value="_vonageApp.Capabilities.Messages.webhooks.InboundUrl.Address"></InputText>
+                </div>
+            </div>
+            
+            <div class="field-container">
+                <div class="field-label"><label>Status Webhook:</label></div>
+                <div class="field-content">
+                    <InputText @bind-Value="_vonageApp.Capabilities.Messages.webhooks.StatusUrl.Address"></InputText>
+                </div>
+            </div>
+            
+            <div class="field-container">
+                <div class="field-label"><label>Authenticate in bound media:</label></div>
+                <div class="field-content">
+                    <InputCheckbox @bind-Value="_vonageApp.Capabilities.Messages.authenticate_inbound_media"></InputCheckbox>
+                </div>
+            </div>
+
+        </EditForm>
+        <button @onclick="ToggleEditMode">Save</button>
+    }
+    else
+    {
+
+        <h4>Public Key</h4>
+        <div>@_vonageApp.Keys.PublicKey</div>
+
+        <div>
+            <h4>Privacy</h4>
+            <div class="field-container">
+                <div class="field-label"><label>Improve AI:</label></div>
+                <div class="field-content">
+                    <input type="checkbox" disabled="disabled" checked="@_vonageApp.Privacy.ImproveAi"/>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4>Capabilities</h4>
+            @if (_vonageApp.Capabilities.Messages != null)
+            {
+                <h5>Messages</h5>
+                <div class="field-container">
+                    <div class="field-label"><label>Inbound Webhook:</label></div>
+                    <div class="field-content">@_vonageApp.Capabilities.Messages.webhooks.InboundUrl.Address</div>
+                </div>
+
+                <div class="field-container">
+                    <div class="field-label"><label>Status Webhook:</label></div>
+                    <div class="field-content">@_vonageApp.Capabilities.Messages.webhooks.StatusUrl.Address</div>
+                </div>
+
+                <div class="field-container">
+                    <div class="field-label"><label>Version:</label></div>
+                    <div class="field-content">@_vonageApp.Capabilities.Messages.Version</div>
+                </div>
+
+                <div class="field-container">
+                    <div class="field-label"><label>Authenticate in bound media:</label></div>
+                    <div class="field-content">
+                        <input type="checkbox" disabled="disabled" checked="@_vonageApp.Capabilities.Messages.authenticate_inbound_media"/>
+                    </div>
+                </div>
+            }
+        </div>
+
+        if (_knownByApplication)
+        {
+            <button @onclick="ToggleEditMode">Edit Application</button>
+
+            <div>
+                <h4>Send Message</h4>
+                <div class="field-container">
+                    <div class="field-label"><label>Message Text:</label></div>
+                    <div class="field-content"><input type="text" @bind="_messageText"/></div>
+                </div>
+                
+                <div class="field-container">
+                    <div class="field-label"><label>Send to:</label></div>
+                    <div class="field-content"><input @bind="_messageNumber"/></div>
+                </div>
+
+                <button @onclick="SendMessage">Send Message</button>
+            </div>
+        }
+    }
+}
+
+@code {
+    [Parameter]
+    public Guid? Id { get; set; }
+
+    private string _messageText = string.Empty;
+    private string _messageNumber = string.Empty;
+
+    private bool _editMode;
+    private bool _knownByApplication;
+
+    private VonageApp? _vonageApp;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id.HasValue)
+        {
+            _vonageApp = await ApplicationService.GetApp(Id.GetValueOrDefault());
+            _knownByApplication = await ApplicationService.KnownByApplication(Id.GetValueOrDefault());
+        }
+        else
+        {
+            _editMode = true;
+            _vonageApp = NewVonageApplication();
+        }
+
+    }
+
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(_messageText) || string.IsNullOrWhiteSpace(_messageNumber))
+        {
+            return;
+        }
+
+        await MessageService.SendMessage(_messageNumber, _messageText, Id.GetValueOrDefault());
+        _messageNumber = string.Empty;
+        _messageText = string.Empty;
+    }
+
+    private async Task ToggleEditMode()
+    {
+        if (_editMode)
+        {
+            if (Id.HasValue)
+            {
+                await ApplicationService.UpdateApp(_vonageApp!);
+            }
+            else
+            {
+                await ApplicationService.CreateApp(_vonageApp!);
+                NavigationManager.NavigateTo("/");
+            }
+        }
+        _editMode = !_editMode;
+    }
+
+    private async Task Delete()
+    {
+        await ApplicationService.DeleteApp(Id.GetValueOrDefault());
+        NavigationManager.NavigateTo("/");
+
+    }
+
+    private static VonageApp NewVonageApplication()
+    {
+        return new VonageApp
+        {
+            Capabilities = new Capabilities
+            {
+                Messages = new Messages
+                {
+                    webhooks = new Webhooks
+                    {
+                        StatusUrl = new VonageUrl(),
+                        InboundUrl = new VonageUrl()
+                    }
+                }
+            },
+            Keys = new Keys(),
+            Privacy = new Privacy()
+        };
+    }
+}

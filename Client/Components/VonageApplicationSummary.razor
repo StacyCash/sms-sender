@@ -1,0 +1,16 @@
+﻿@inject NavigationManager NavigationManager
+<article @onclick="NavigateToApplication">
+    <h3>@Application.Name</h3>
+    <div><label>Application Id:</label> @Application.Id</div>
+</article>
+
+@code {
+
+    [Parameter]
+    public VonageApp Application { get; set; }
+
+    private void NavigateToApplication()
+    {
+        NavigationManager.NavigateTo($"application/{Application.Id}/Edit");
+    }
+}
