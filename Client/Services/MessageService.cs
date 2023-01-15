@@ -51,8 +51,8 @@ namespace Client.Services
                     @"select
                     t.id,
                     t.privateKey
-                  from t
-                  where 
+                    from t
+                    where 
                     t.userId = @userId 
                     and t.id = @id")
                 .WithParameter("@userId", userId)

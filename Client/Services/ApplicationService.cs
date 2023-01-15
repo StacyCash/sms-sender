@@ -128,19 +128,19 @@ namespace Client.Services
             QueryDefinition query = new QueryDefinition(
                     @"select
                     t.id
-                  from t
-                  where 
+                    from t
+                    where 
                     t.userId = @userId 
                     and t.id = @id")
                 .WithParameter("@userId", userId)
                 .WithParameter("@id", id.ToString());
-            var todosIterator = container.GetItemQueryIterator<dynamic>(query, null, new QueryRequestOptions());
+            var appIterator = container.GetItemQueryIterator<dynamic>(query, null, new QueryRequestOptions());
 
             List<dynamic> results = new List<dynamic>();
 
-            while (todosIterator.HasMoreResults)
+            while (appIterator.HasMoreResults)
             {
-                results.AddRange(await todosIterator.ReadNextAsync());
+                results.AddRange(await appIterator.ReadNextAsync());
             }
 
             return results.Count > 0;
